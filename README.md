@@ -1,5 +1,6 @@
 # maple
 Вариант 3
+http://math.spbu.ru/user/pan/site_full.pdf
 
 ###Требуется
 1. Отделить корни на указанном интервале.
