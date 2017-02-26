@@ -1,19 +1,10 @@
 import numpy as np
 import array
+from Norm import norm_inf
+
 A= np.matrix('8.29381 0.995516 -0.560617 ; 0.995516 6.298198 0.595772 ;-0.560617 0.595772 4.997407')
 b=np.matrix(' 0.766522 ; 3.844422 ; 3.844422 ')
 
-def norm_inf(mat):
-	max=0
-	num_rows, num_cols =mat.shape
-	i=0
-	while(i<num_rows):
-		j=0
-		sum=np.sum(np.absolute(mat[i]))
-		if (max<sum):
-			max=sum	
-		i=i+1
-	return max
 eps=0.00001
 def solve(mat):
 	i=0
