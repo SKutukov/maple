@@ -70,12 +70,65 @@ def aprior(H,g,x_0,k):
 print aprior(H,g,x_0,k_teor)
 print "ERROR apostorior: "
 print dx
+#todo: Bag
 r=math.fabs(np.linalg.eig(H)[0].max())
 x_lust=x_k_1+(x_iter-x_k_1)/(1-r)
 print "lusternick :",x_lust
+print "ERROR lust: "
 print x_lust-x_ext
 
 print "5) Zeidel"
-def zeidel(H,g,x_0,eps):
+def transform_H(H):
+	num_rows, num_cols=H.shape
+	i=0
+	H_l=np.empty(H.shape)
+	H_r=np.empty(H.shape)
+	#H_l
+	while(i<num_rows):
+		j=i
+		while(j<num_cols):
+			H_r[i,j]=H[i,j]		
+			j=j+1
+		i=i+1
+
+	i=0
+	while(i<num_rows):
+		j=0
+		while(j<i):
+			H_l[i,j]=H[i,j]
+			j=j+1
+		i=i+1	
+	return H_l,H_r
+#todo: Bag
+def zeidel(H,g,x_0,x_ext,eps,max_k):
+	H_l,H_r=transform_H(H)	
+	num_rows, num_cols=H.shape
+	dx=2*eps
 	x=x_0
-	return x	
+	k=0
+	print H_l
+	print H_r 
+	E=np.identity(num_rows)
+	M=np.linalg.inv(E-H_l)
+	#print M
+	mat=M*H_r
+	c=M*g
+	#todo: bags mat=0??????????????????????? 
+	#print mat
+	while((dx>eps) & (k<max_k)):
+		#print(dx)
+		x1=x
+		x=mat*x+c
+		dx=norm_inf(x-x_ext)
+		#print x1-x
+		k=k+1
+	return x,k
+
+x_zeid,k_zeid=zeidel(H,g,x_0,x_ext,eps,25)
+print "k_zeid: ", k_zeid
+print x_zeid
+print "ERRROR zeid: "
+print (x_zeid-x_ext)
+
+
+	
