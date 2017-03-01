@@ -1,6 +1,7 @@
 import  numpy as np
 import math
 from Norm import norm_inf 
+from Norm import mul 
 A= np.matrix('8.29381 0.995516 -0.560617 ; 0.995516 6.298198 0.595772 ;-0.560617 0.595772 4.997407')
 b=np.matrix(' 0.766522 ; 3.844422 ; 3.844422 ')
 
@@ -99,19 +100,22 @@ def transform_H(H):
 			j=j+1
 		i=i+1	
 	return H_l,H_r
-#todo: Bag
 def zeidel(H,g,x_0,x_ext,eps,max_k):
 	H_l,H_r=transform_H(H)	
 	num_rows, num_cols=H.shape
 	dx=2*eps
 	x=x_0
 	k=0
-	print H_l
-	print H_r 
+#	print H_l
+#	print H_r 
 	E=np.identity(num_rows)
+#	print(E-H_l)
 	M=np.linalg.inv(E-H_l)
-	#print M
-	mat=M*H_r
+#	print M
+#	print H_r
+	mat=np.empty(H.shape) 
+	mat=mul(M,H_r)
+#	print mat
 	c=M*g
 	#todo: bags mat=0??????????????????????? 
 	#print mat
@@ -129,6 +133,52 @@ print "k_zeid: ", k_zeid
 print x_zeid
 print "ERRROR zeid: "
 print (x_zeid-x_ext)
+
+print "7) up relacs: "
+def sum1(H,x,i):
+	sum=0
+	num_rows, num_cols=H.shape
+	j=0
+	while(j<=i):
+		sum=sum+H[i,j]*x[j]
+		j=j+1
+	return sum
+def sum2(H,x,i):
+	sum=0
+	num_rows, num_cols=H.shape
+	j=i+1
+	while(j<num_rows):
+		sum=sum+H[i,j]*x[j]
+		j=j+1
+	return sum
+def relacs(H,g,x_0,eps,max_k):
+	r=math.fabs(np.linalg.eig(H)[0].max())	
+	q=2/(1+math.sqrt(1-r*r))
+	print q
+	num_rows, num_cols=H.shape
+	dx=2*eps
+	x=x_0
+	k=0
+	while((dx>eps) & (k<max_k)):
+		#print(dx)
+		x1=x
+		i=0
+		while (i<num_rows):
+			sum_1=sum1(H,x,i)
+			sum_2=sum2(H,x,i)
+			x[i]=x[i]+q*(sum_1+sum_2-x[i]+g[i])
+			i=i+1
+		dx=norm_inf(x-x_ext)
+		#print x1-x
+		k=k+1
+	return x,k
+	
+x_relacs,k_relacs=relacs(H,g,x_0,eps,25)
+print "k_relaks",k_relacs
+print "x_relacs: "
+print x_relacs
+print "ERROR relacs:"
+print x_relacs-x_ext			
 
 
 	
