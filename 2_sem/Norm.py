@@ -29,3 +29,14 @@ def mul(A,B):
 			j=j+1
 		i=i+1		
 	return C
+
+def max_fabs(h):
+	max_value=np.fabs(h[0])
+	for i in range(0,h.shape[0]):
+		if(max_value<np.fabs(h[i])):
+			max_value=np.fabs(h[i])
+	return max_value
+	
+def spectr_radius(H):
+	return max_fabs(np.linalg.eig(H)[0])
+

@@ -2,6 +2,7 @@ import  numpy as np
 import math
 from Norm import norm_inf 
 from Norm import mul 
+from Norm import spectr_radius
 A= np.matrix('8.29381 0.995516 -0.560617 ; 0.995516 6.298198 0.595772 ;-0.560617 0.595772 4.997407')
 b=np.matrix(' 0.766522 ; 3.844422 ; 3.844422 ')
 
@@ -36,7 +37,7 @@ print "g: "
 print g
 print "Norm of H: "
 print norm_inf(H)
-eps=0.001
+eps=0.0001
 print "3) find k, ||x_*-x^k||<eps"
 def find_K(H,g,x_0,eps):
 	d=norm_inf(x_0)+norm_inf(g)/(1-norm_inf(H))
@@ -71,8 +72,7 @@ def aprior(H,g,x_0,k):
 print aprior(H,g,x_0,k_teor)
 print "ERROR apostorior: "
 print dx
-#todo: Bag
-r=math.fabs(np.linalg.eig(H)[0].max())
+r=spectr_radius(H)
 x_lust=x_k_1+(x_iter-x_k_1)/(1-r)
 print "lusternick :",x_lust
 print "ERROR lust: "
@@ -103,30 +103,13 @@ def transform_H(H):
 def zeidel(H,g,x_0,x_ext,eps,max_k):
 	H_l,H_r=transform_H(H)	
 	num_rows, num_cols=H.shape
-	dx=2*eps
-	x=x_0
-	k=0
-#	print H_l
-#	print H_r 
 	E=np.identity(num_rows)
-#	print(E-H_l)
 	M=np.linalg.inv(E-H_l)
-#	print M
-#	print H_r
 	mat=np.empty(H.shape) 
 	mat=mul(M,H_r)
-#	print mat
 	c=M*g
-	#todo: bags mat=0??????????????????????? 
-	#print mat
-	while((dx>eps) & (k<max_k)):
-		#print(dx)
-		x1=x
-		x=mat*x+c
-		dx=norm_inf(x-x_ext)
-		#print x1-x
-		k=k+1
-	return x,k
+	x,k_ext,dx,x_k_1= iteration(mat,c,x_0,eps)
+	return x,k_ext
 
 x_zeid,k_zeid=zeidel(H,g,x_0,x_ext,eps,25)
 print "k_zeid: ", k_zeid
@@ -143,6 +126,7 @@ def sum1(H,x,i):
 		sum=sum+H[i,j]*x[j]
 		j=j+1
 	return sum
+
 def sum2(H,x,i):
 	sum=0
 	num_rows, num_cols=H.shape
@@ -151,34 +135,45 @@ def sum2(H,x,i):
 		sum=sum+H[i,j]*x[j]
 		j=j+1
 	return sum
-def relacs(H,g,x_0,eps,max_k):
-	r=math.fabs(np.linalg.eig(H)[0].max())	
-	q=2/(1+math.sqrt(1-r*r))
-	print q
+r=spectr_radius(H)
+q=2/(1+math.sqrt(1-r*r))
+def relacs(H,g,x_0,eps,max_k,q):
 	num_rows, num_cols=H.shape
 	dx=2*eps
 	x=x_0
 	k=0
 	while((dx>eps) & (k<max_k)):
 		#print(dx)
-		x1=x
-		i=0
-		while (i<num_rows):
-			sum_1=sum1(H,x,i)
-			sum_2=sum2(H,x,i)
-			x[i]=x[i]+q*(sum_1+sum_2-x[i]+g[i])
-			i=i+1
+		dx_it=2*eps
+		s=0
+		while((dx_it>(eps/1000))&(s<max_k)):
+			x1=x
+			i=0
+			while (i<num_rows):
+				sum_1=sum1(H,x,i)
+				sum_2=sum2(H,x,i)
+				x[i]=x[i]+q*(sum_1+sum_2-x[i]+g[i])
+				i=i+1
+			s=s+1
+			dx_it=norm_inf(x-x1)
+		#print s
 		dx=norm_inf(x-x_ext)
 		#print x1-x
 		k=k+1
 	return x,k
-	
-x_relacs,k_relacs=relacs(H,g,x_0,eps,25)
-print "k_relaks",k_relacs
-print "x_relacs: "
-print x_relacs
-print "ERROR relacs:"
-print x_relacs-x_ext			
-
-
+def print_relacs(H,g,x_0,eps,k_max,q):
+	x_relacs,k_relacs=relacs(H,g,x_0,eps,k_max,q)
+#	print "k_relaks",k_relacs
+#	print "x_relacs: "	
+#	print x_relacs
+	print "ERROR relacs:"
+	print x_relacs-x_ext
+print "q: ",1			
+print_relacs(H,g,x_0,eps,25,1)
+print "q: ",q			
+print_relacs(H,g,x_0,eps,25,q)
+print "q: ",q+0.1
+print_relacs(H,g,x_0,eps,25,q+0.1)
+print "q: ",q-0.1
+print_relacs(H,g,x_0,eps,25,q-0.1)
 	
