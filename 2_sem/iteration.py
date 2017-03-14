@@ -10,7 +10,7 @@ print b
 print "1)Solve gaus: "
 x_ext= np.linalg.solve(A,b)
 print x_ext
-#################################################################
+###################################### transform to iteration form ###########################
 def transformation(A,b):
 	num_rows, num_cols=A.shape
 	H=np.empty(A.shape)
@@ -39,7 +39,7 @@ print g
 print "Norm of H: "
 print norm_inf(H)
 eps=0.000001
-######################################################################3
+################################ simple itaration #####################################3
 print "3) find k, ||x_*-x^k||<eps"
 def find_K(H,g,x_0,eps):
 	d=norm_inf(x_0)+norm_inf(g)/(1-norm_inf(H))
@@ -84,7 +84,7 @@ x_lust=x_k_1+(x_iter-x_k_1)/(1-r)
 print "lusternick :",x_lust
 print "ERROR lust: "
 print x_lust-x_ext
-#################################################################
+######################### zeidel ########################################
 print "5) Zeidel"
 def transform_H(H):
 	num_rows, num_cols=H.shape
@@ -107,7 +107,7 @@ def transform_H(H):
 			j=j+1
 		i=i+1	
 	return H_l,H_r
-def zeidel(H,g,x_0,x_ext,eps,max_k):
+def zeidel_like_iteration(H,g,x_0,x_ext,eps,max_k):
 	H_l,H_r=transform_H(H)	
 	num_rows, num_cols=H.shape
 	E=np.identity(num_rows)
@@ -134,10 +134,10 @@ def sum2(H,x,i):
 		sum=sum+H[i,j]*x[j]
 		j=j+1
 	return sum
-def zeidel_correct(H,g,x_0,x_ext,eps,max_k):
+def zeidel(H,g,x_0,x_ext,eps,max_k):
 	num_rows, num_cols=H.shape
 	dx=2*eps
-	x=x_0
+	x=x_0.copy()
 	k=0
 	x1=x
 	while(dx>eps):
@@ -151,10 +151,38 @@ def zeidel_correct(H,g,x_0,x_ext,eps,max_k):
 		dx=norm_inf(x_ext-x)
 		k=k+1
 	return x,k
-x_zeid,k_zeid=zeidel_correct(H,g,x_0,x_ext,eps,25)
+x_zeid,k_zeid=zeidel(H,g,x_0,x_ext,eps,25)
 print "k_zeid: ", k_zeid
 print x_zeid
 print "ERRROR zeid: "
 print (x_zeid-x_ext)
-#################################################################
+########################## relacs #######################################
+print "7) up relacs: "
+r=spectr_radius(H)
+print r
 
+def relacs(H,g,x_0,eps,max_k,q):
+	num_rows, num_cols=H.shape
+	dx=2*eps
+	x=x_0.copy()
+	k=0
+	x1=x
+	while(dx>eps):
+		i=0
+		while (i<num_rows):
+			sum_1=sum1(H,x,i)
+			sum_2=sum2(H,x1,i)
+			x[i]=x[i]+q*(sum_1+sum_2-x[i]+g[i])
+			i=i+1
+		x1=x	
+		dx=norm_inf(x_ext-x)
+		k=k+1
+	return x,k	
+	
+q=2/(1+math.sqrt(1-r*r))
+print "q: ",q
+x_relacs,k_relacs=relacs(H,g,x_0,eps,25,q)
+print "k_relaks",k_relacs
+print "ERROR relacs:"
+print x_relacs-x_ext
+	
