@@ -5,11 +5,12 @@ from Norm import mul
 from Norm import spectr_radius
 A= np.matrix('8.29381 0.995516 -0.560617 ; 0.995516 6.298198 0.595772 ;-0.560617 0.595772 4.997407')
 b=np.matrix(' 0.766522 ; 3.844422 ; 3.844422 ')
-
+print A
+print b
 print "1)Solve gaus: "
 x_ext= np.linalg.solve(A,b)
 print x_ext
-
+#################################################################
 def transformation(A,b):
 	num_rows, num_cols=A.shape
 	H=np.empty(A.shape)
@@ -37,7 +38,8 @@ print "g: "
 print g
 print "Norm of H: "
 print norm_inf(H)
-eps=0.0001
+eps=0.000001
+######################################################################3
 print "3) find k, ||x_*-x^k||<eps"
 def find_K(H,g,x_0,eps):
 	d=norm_inf(x_0)+norm_inf(g)/(1-norm_inf(H))
@@ -52,14 +54,19 @@ def iteration(H,g,x_0,eps):
 	x=x_0
 	k=0
 	h=norm_inf(H)/(1-norm_inf(H))
+	x1=x
+	x2=H*x1+g
+	x=H*x2+g
 	while(dx>eps):
 		#print(dx)
+		x2=x1
 		x1=x
 		x=H*x+g
 		dx=h*norm_inf(x1-x)
+		r=norm_inf(x-x1)/norm_inf(x1-x2)
 		k=k+1
-	return x,k,dx,x1
-x_iter,k_ext,dx,x_k_1= iteration(H,g,x_0,eps)
+	return x,k,dx,x1,r
+x_iter,k_ext,dx,x_k_1,r_exp= iteration(H,g,x_0,eps)
 print x_iter
 print "k_ext: ", k_ext
 print "ERROR x_ext-x_iter: "
@@ -77,7 +84,7 @@ x_lust=x_k_1+(x_iter-x_k_1)/(1-r)
 print "lusternick :",x_lust
 print "ERROR lust: "
 print x_lust-x_ext
-
+#################################################################
 print "5) Zeidel"
 def transform_H(H):
 	num_rows, num_cols=H.shape
@@ -108,16 +115,8 @@ def zeidel(H,g,x_0,x_ext,eps,max_k):
 	mat=np.empty(H.shape) 
 	mat=mul(M,H_r)
 	c=M*g
-	x,k_ext,dx,x_k_1= iteration(mat,c,x_0,eps)
+	x,k_ext,dx,x_k_1,r= iteration(mat,c,x_0,eps)
 	return x,k_ext
-
-x_zeid,k_zeid=zeidel(H,g,x_0,x_ext,eps,25)
-print "k_zeid: ", k_zeid
-print x_zeid
-print "ERRROR zeid: "
-print (x_zeid-x_ext)
-
-print "7) up relacs: "
 def sum1(H,x,i):
 	sum=0
 	num_rows, num_cols=H.shape
@@ -135,45 +134,27 @@ def sum2(H,x,i):
 		sum=sum+H[i,j]*x[j]
 		j=j+1
 	return sum
-r=spectr_radius(H)
-q=2/(1+math.sqrt(1-r*r))
-def relacs(H,g,x_0,eps,max_k,q):
+def zeidel_correct(H,g,x_0,x_ext,eps,max_k):
 	num_rows, num_cols=H.shape
 	dx=2*eps
 	x=x_0
 	k=0
-	while((dx>eps) & (k<max_k)):
-		#print(dx)
-		dx_it=2*eps
-		s=0
-		while((dx_it>(eps/1000))&(s<max_k)):
-			x1=x
-			i=0
-			while (i<num_rows):
-				sum_1=sum1(H,x,i)
-				sum_2=sum2(H,x,i)
-				x[i]=x[i]+q*(sum_1+sum_2-x[i]+g[i])
-				i=i+1
-			s=s+1
-			dx_it=norm_inf(x-x1)
-		#print s
-		dx=norm_inf(x-x_ext)
-		#print x1-x
+	x1=x
+	while(dx>eps):
+		i=0
+		while (i<num_rows):
+			sum_1=sum1(H,x,i)
+			sum_2=sum2(H,x1,i)
+			x[i]=x[i]+(sum_1+sum_2-x[i]+g[i])
+			i=i+1
+		x1=x	
+		dx=norm_inf(x_ext-x)
 		k=k+1
 	return x,k
-def print_relacs(H,g,x_0,eps,k_max,q):
-	x_relacs,k_relacs=relacs(H,g,x_0,eps,k_max,q)
-#	print "k_relaks",k_relacs
-#	print "x_relacs: "	
-#	print x_relacs
-	print "ERROR relacs:"
-	print x_relacs-x_ext
-print "q: ",1			
-print_relacs(H,g,x_0,eps,25,1)
-print "q: ",q			
-print_relacs(H,g,x_0,eps,25,q)
-print "q: ",q+0.1
-print_relacs(H,g,x_0,eps,25,q+0.1)
-print "q: ",q-0.1
-print_relacs(H,g,x_0,eps,25,q-0.1)
-	
+x_zeid,k_zeid=zeidel_correct(H,g,x_0,x_ext,eps,25)
+print "k_zeid: ", k_zeid
+print x_zeid
+print "ERRROR zeid: "
+print (x_zeid-x_ext)
+#################################################################
+
