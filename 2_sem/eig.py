@@ -1,5 +1,7 @@
 import  numpy as np
 import math
+import array
+
 
 ##################### load data #######################
 import argparse as ap
@@ -10,9 +12,20 @@ parser.add_argument("-e", "--eps", help="Path to matrix file", required="True")
 args = vars(parser.parse_args())
 # Read file
 f= open(args["matrix"],'r')
-A= np.matrix(f.read())
+content = f.readlines()
+A= np.matrix(content[0])
 f.close()
 eps=float(args["eps"])
 ########################################################
-
+print "matrix A: "
 print A
+print "eig numbers: "
+print np.linalg.eig(A)[0]
+
+def Yakobi(A,eps):
+	return np.linalg.eig(A)
+
+def opsiteSpectr(A,lmbd):
+	return linalg.eig(A)[0]
+def Viland(A,eps):
+	return linalg.eig(A)[0][0]
