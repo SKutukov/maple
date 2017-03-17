@@ -1,11 +1,21 @@
 import numpy as np
 import array
 from Norm import norm_inf
-
-A= np.matrix('8.29381 0.995516 -0.560617 ; 0.995516 6.298198 0.595772 ;-0.560617 0.595772 4.997407')
-b=np.matrix(' 0.766522 ; 3.844422 ; 3.844422 ')
-
-eps=0.00001
+########### load data ##################
+import argparse as ap
+# Get the path of matrix
+parser = ap.ArgumentParser()
+parser.add_argument("-m", "--matrix", help="Path to matrix file", required="True")
+parser.add_argument("-e", "--eps", help="Path to matrix file", required="True")
+args = vars(parser.parse_args())
+# Read file
+f= open(args["matrix"],'r')
+content = f.readlines()
+A= np.matrix(content[0])
+b= np.matrix(content[1])
+f.close()
+eps=float(args["eps"])
+########################  solve standart gays  ##########################
 def solve(mat):
 	i=0
 	num_rows, num_cols=A.shape
@@ -32,6 +42,7 @@ def solve(mat):
 		i=i-1
 #	print(mat)
 	return mat[:,num_cols]
+############## find max ####################
 def find_max(mat,row,col):
 	i=row
 	c=i
@@ -53,6 +64,7 @@ def find_max(mat,row,col):
 			r=row						
 		j=j+1
 	return ret,r,c	
+############## solve gaus with choosing max element ####################
 def solve_ch(mat):
 #	print mat	
 	i=0
@@ -93,6 +105,7 @@ def solve_ch(mat):
 #	print(mat)
 	print index[0],index[1],index[2]
 	return mat[:,num_cols]
+############## find invariant matrix ####################
 def inv_matrix(A):
 	
 	num_rows, num_cols=A.shape
@@ -109,6 +122,8 @@ def inv_matrix(A):
 		i=i+1
 		
 	return ret
+
+############## solve system with all method ####################
 def fun(A,b):
 	print("matrix A: ") 
 	print(A)
@@ -144,5 +159,5 @@ print("normal matrix: ")
 fun(A,b)
 print("extremal  matrix: ")
 A[0,0]=eps/10000000;
-b=np.matrix(' 0.766522 ; 3.844422 ; 3.844422 ')
+b=np.matrix(content[1])
 fun(A,b)

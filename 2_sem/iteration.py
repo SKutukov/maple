@@ -3,8 +3,22 @@ import math
 from Norm import norm_inf 
 from Norm import mul 
 from Norm import spectr_radius
-A= np.matrix('8.29381 0.995516 -0.560617 ; 0.995516 6.298198 0.595772 ;-0.560617 0.595772 4.997407')
-b=np.matrix(' 0.766522 ; 3.844422 ; 3.844422 ')
+
+########### load data ##################
+import argparse as ap
+# Get the path of matrix
+parser = ap.ArgumentParser()
+parser.add_argument("-m", "--matrix", help="Path to matrix file", required="True")
+parser.add_argument("-e", "--eps", help="Path to matrix file", required="True")
+args = vars(parser.parse_args())
+# Read file
+f= open(args["matrix"],'r')
+content = f.readlines()
+A= np.matrix(content[0])
+b= np.matrix(content[1])
+f.close()
+eps=float(args["eps"])
+##########################################
 print A
 print b
 print "1)Solve gaus: "
