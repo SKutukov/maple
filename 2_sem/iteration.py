@@ -9,7 +9,7 @@ import argparse as ap
 # Get the path of matrix
 parser = ap.ArgumentParser()
 parser.add_argument("-m", "--matrix", help="Path to matrix file", required="True")
-parser.add_argument("-e", "--eps", help="Path to matrix file", required="True")
+parser.add_argument("-e", "--eps", help="Calculation error", required="True")
 args = vars(parser.parse_args())
 # Read file
 f= open(args["matrix"],'r')
