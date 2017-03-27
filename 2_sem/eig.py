@@ -16,13 +16,7 @@ content = f.readlines()
 A= np.matrix(content[0])
 f.close()
 eps=float(args["eps"])
-########################################################
-print "matrix A: "
-print A	
-print "eig numbers: "
-print np.linalg.eig(A)[0]
-print "eig vectors: "
-print np.linalg.eig(A)[1]
+
 ################### find max in updiagonal elem ##########
 def find_max(mat):
 	col=1
@@ -62,6 +56,9 @@ def calc_c_s(mat,row,col):
 	res[col,col]=c
 	res[row,col]=-s
 	res[col,row]=s
+	#print (c*c-s*s)*mat[row,col]+c*s*(mat[col,col]-mat[row,row])
+	if ((c*c-s*s)*mat[row,col]+c*s*(mat[col,col]-mat[row,row])>eps):
+		print "error c and s is wrong" 
 	return res,c,s
 ##########################################
 
@@ -71,13 +68,12 @@ def Yakobi(A,eps):
 	row,col=find_max(A_k)
 	max_elem=np.fabs(A_k[row,col])
 	X=np.identity(A.shape[0])
-	while (max_elem>eps and i<4):
+	while (max_elem>eps and i<100):
 		#print row,col
-		res,c,s=calc_c_s(A,row,col)
+		res,c,s=calc_c_s(A_k,row,col)
+		#print c,s
 		#print res
 		X=mul(X,res)
-		#A_k=res.T*A_k*res		
-		
 		a_i_i=A_k[row,row].copy()
 		a_j_j=A_k[col,col].copy()
 		a_i_j=A_k[row,col].copy()
@@ -101,17 +97,29 @@ def Yakobi(A,eps):
 		#A_k[row,col]=A_k[col,row]=0;
 		row,col=find_max(A_k)
 		max_elem=np.fabs(A_k[row,col])
-		#print A_k
+		#print A_k 
+		#print np.linalg.norm(A_k-A_k.T)
 		#print X
 		i=i+1
+	print i
+	i=0
+	while i<A.shape[0] :
+		X[:,i]=X[:,i]/np.linalg.norm(X[:,i])
+		i=i+1
 	return np.diagonal(A_k),X
+########################################################
+print "matrix A: "
+print A	
+print "eig numbers: "
+print np.linalg.eig(A)[0]
+print "eig vectors: "
+print np.linalg.eig(A)[1]
 print "Yakobi : "
 D,X= Yakobi(A,eps)
+print "eig numbers: "
 print D
+print "eig vectors: "
 print X
-print X[:,0]/np.linalg.norm(X[:,0])
-print X[:,1]/np.linalg.norm(X[:,1])
-print X[:,2]/np.linalg.norm(X[:,2])
 Y_0=np.linalg.eig(A)[1][0]*0.9+np.linalg.eig(A)[1][1]*0.5+np.linalg.eig(A)[1][2]*0.6
 def sc(a,b):
 	return a[0]*b[0]+a[1]*b[1]+a[2]*b[2]
@@ -139,7 +147,7 @@ print opsiteSpectr(A,np.linalg.eig(A)[0][0],eps)
 def Viland(A,lm_0,eps):
 	W=A-lm_0*np.identity(A.shape[0])
 	W=np.linalg.inv(W)
-	print np.linalg.eig(W)[1]
+	#print np.linalg.eig(W)[1]
 	Y_0=np.linalg.eig(W)[1][0]*0.9+np.linalg.eig(W)[1][1]*0.5+np.linalg.eig(W)[1][2]*0.6
 	lambd,X=scalar(W,Y_0,eps)			
 	return 1/lambd+lm_0,X
