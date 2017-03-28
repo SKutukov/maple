@@ -15,7 +15,7 @@ def mul(A,B):
 	num_rowsA, num_colsA=A.shape
 	num_rowsB, num_colsB=B.shape
 	if (num_colsA!=num_rowsB):
-		print "study algebra!!!!!"
+		print ("study algebra!!!!!")
 		return
 	C=np.empty([num_rowsA,num_colsB])
 	i=0

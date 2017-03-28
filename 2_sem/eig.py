@@ -1,7 +1,7 @@
 import  numpy as np
 import math
 import array
-from Norm import mul 
+#from Norm import mul 
 
 ##################### load data #######################
 import argparse as ap
@@ -52,16 +52,15 @@ def calc_c_s(mat,row,col):
 	c=math.sqrt(( 1 +  f/d)/2)
 	s=sign(mat[row,col]*(mat[row,row]-mat[col,col])) * math.sqrt(( 1 -  f/d)/2)
 	res=np.identity(mat.shape[0])
- 	res[row,row]=c
+	res[row,row]=c
 	res[col,col]=c
 	res[row,col]=-s
 	res[col,row]=s
 	#print (c*c-s*s)*mat[row,col]+c*s*(mat[col,col]-mat[row,row])
 	if ((c*c-s*s)*mat[row,col]+c*s*(mat[col,col]-mat[row,row])>eps):
-		print "error c and s is wrong" 
+		print( "error c and s is wrong") 
 	return res,c,s
 ##########################################
-
 def Yakobi(A,eps):
 	A_k=A.copy()
 	i=0
@@ -70,10 +69,23 @@ def Yakobi(A,eps):
 	X=np.identity(A.shape[0])
 	while (max_elem>eps and i<100):
 		#print row,col
-		res,c,s=calc_c_s(A_k,row,col)
+		V,c,s=calc_c_s(A_k,row,col)
 		#print c,s
 		#print res
-		X=mul(X,res)
+############# X ########################
+		X_i=X[:,row].copy()
+		X_j=X[:,col].copy()
+		X_c=X.copy()
+		#A_k(*,i)=.......
+		#i=0
+		#X[row,:]=(c*X_i+s*X_j).T
+		X[:,row]=(c*X_i+s*X_j)
+		#A_k(*,j)=.......
+		#X[col,:]=(-s*X_i+c*X_j).T		
+		X[:,col]=(-s*X_i+c*X_j)
+
+###############################################
+		#print (X)
 		a_i_i=A_k[row,row].copy()
 		a_j_j=A_k[col,col].copy()
 		a_i_j=A_k[row,col].copy()
@@ -101,49 +113,55 @@ def Yakobi(A,eps):
 		#print np.linalg.norm(A_k-A_k.T)
 		#print X
 		i=i+1
-	print i
+#	print i
 	i=0
 	while i<A.shape[0] :
 		X[:,i]=X[:,i]/np.linalg.norm(X[:,i])
 		i=i+1
+	#print (X)
+	print(A_k)
 	return np.diagonal(A_k),X
 ########################################################
-print "matrix A: "
-print A	
-print "eig numbers: "
-print np.linalg.eig(A)[0]
-print "eig vectors: "
-print np.linalg.eig(A)[1]
-print "Yakobi : "
+print ("matrix A: ")
+print (A)	
+print ("eig numbers: ")
+print (np.linalg.eig(A)[0])
+print ("eig vectors: ")
+print (np.linalg.eig(A)[1])
+print ("Yakobi : ")
 D,X= Yakobi(A,eps)
-print "eig numbers: "
-print D
-print "eig vectors: "
-print X
+print ("eig numbers: ")
+print (D)
+print (X)
 Y_0=np.linalg.eig(A)[1][0]*0.9+np.linalg.eig(A)[1][1]*0.5+np.linalg.eig(A)[1][2]*0.6
+print (Y_0)
 def sc(a,b):
 	return a[0]*b[0]+a[1]*b[1]+a[2]*b[2]
 def scalar(A,Y,eps):
 	Y_k=Y.T
 	dl=2*eps
 	lm=1
+	i=0
 	while(dl>eps):
 		Y_k_1=A*Y_k
 		tm=lm
 		lm=sc(Y_k_1,Y_k)/sc(Y_k,Y_k)
 		Y_k=Y_k_1
-		dl=np.fabs(lm-tm)			
+		dl=np.fabs(lm-tm)
+		i=i+1	
+	print("iter:")
+	print (i)		
 	return lm,Y_k
 def opsiteSpectr(A,lmbd,eps):
 	E=np.identity(A.shape[0])
 	B=A-lmbd*E
-	return scalar(B,Y_0,eps)+lmbd
+	return scalar(B,Y_0,eps)[0][0,0]+lmbd
 	#if (lmbd<0):
 	#	return np.linalg.eig(A)[0][1]	
 	#else:
 	#	return np.linalg.eig(A)[0][1]
-print "opsite Spectr"
-print opsiteSpectr(A,np.linalg.eig(A)[0][0],eps)	
+print ("opsite Spectr")
+print (opsiteSpectr(A,np.linalg.eig(A)[0][0],eps))	
 def Viland(A,lm_0,eps):
 	W=A-lm_0*np.identity(A.shape[0])
 	W=np.linalg.inv(W)
@@ -152,16 +170,16 @@ def Viland(A,lm_0,eps):
 	lambd,X=scalar(W,Y_0,eps)			
 	return 1/lambd+lm_0,X
 lm,X = scalar(A,Y_0,eps)
-print "scalar: : "
+print ("scalar: : ")
 lm=lm[0,0]
 print (X/np.linalg.norm(X))
-print lm
-print "err: "
-print lm-np.linalg.eig(A)[0][0]
-print "Viland : "
+print (lm)
+print ("err: ")
+print (lm-np.linalg.eig(A)[0][0])
+print ("Viland : ")
 l,X=Viland(A,lm,eps)
-print l
+print (l)
 X=(X/np.linalg.norm(X))
-print X
-print "err"
-print l-np.linalg.eig(A)[0][0]
+print (X)
+print ("err")
+print (l-np.linalg.eig(A)[0][0])

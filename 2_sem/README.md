@@ -7,7 +7,7 @@
 4) Подпрограмму нахождения обратной матрицы.
 
 ``
-python gaus.py -m matrix_1.txt -e 0.0001
+python3.6 gaus.py -m matrix_1.txt -e 0.0001
 ``
 
 ### 2.метод итераций
@@ -32,7 +32,7 @@ g D = D −1 b. Здесь D - диагональная матрица, у ко�
 
 
 ``
-python iteration.py  -m matrix_1.txt -e 0.0001
+python3.6 iteration.py  -m matrix_1.txt -e 0.0001
 ``
 
 ### 3.собственные числа
@@ -55,5 +55,5 @@ python iteration.py  -m matrix_1.txt -e 0.0001
 числив невязку.
 
 ``
-python eig.py -m matrix_3.txt -e 0.0001
+python3.6 eig.py -m matrix_3.txt -e 0.0001
 ``
