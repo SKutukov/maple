@@ -20,17 +20,14 @@ def solve(mat):
 	i=0
 	num_rows, num_cols=A.shape
 	#strait run
-	while(i<num_rows):
-		j=i+1
+	for i in range(0, num_rows):
 		a_i_i=mat[i,i]
 		if (a_i_i<eps):
 			print ('warning: div by small number')
 		mat[i]=mat[i]/a_i_i
-		while(j<num_cols):
-			mat[j]=mat[j]-mat[j,i]*mat[i]				
-			j=j+1
-			
-		i=i+1
+		for j in range(i+1, num_rows):
+			mat[j]=mat[j]-mat[j,i]*mat[i]
+
 	#print(mat)
 	#reverce run
 	i=num_rows-1;
