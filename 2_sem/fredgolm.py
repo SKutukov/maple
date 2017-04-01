@@ -9,11 +9,6 @@ parser = ap.ArgumentParser()
 #parser.add_argument("-m", "--matrix", help="Path to matrix file", required="True")
 parser.add_argument("-e", "--eps", help="Calculation error ", required="True")
 args = vars(parser.parse_args())
-# Read file
-#f= open(args["matrix"],'r')
-#content = f.readlines()
-#A= np.matrix(content[0])
-#f.close()
 eps=float(args["eps"])
 ########################################################
 from sympy import *
@@ -28,27 +23,27 @@ b=1
 n=4
 def norm(u,v,a,b):
 	X=np.empty([3,1])
-	X[0,0]=u.subs(x,a).evalf()-v.subs(x,a).evalf()
-	X[1,0]=(u.subs(x,(a+b)/2).evalf()-v.subs(x,(a+b)/2).evalf())
-	X[2,0]=(u.subs(x,b).evalf()-v.subs(x,b).evalf())
-	print (X)
+	X[0,0]=u.subs(x,a)-v.subs(x,a)
+	X[1,0]=(u.subs(x,(a+b)/2)-v.subs(x,(a+b)/2))
+	X[2,0]=(u.subs(x,b)-v.subs(x,b))
+	#print (X)
 	return max_fabs(X)
 def fred_iter(H,A,X,n,a,b,f):
 	g=np.empty([n,1])
 	for i in range(0, n):
-		g[i]=f.subs(x,X[i]).evalf()
+		g[i]=f.subs(x,X[i])
 
 	D=np.identity(n)
 	for i in range(0, n):
 		for j in range(0, n):
-			D[i,j]=D[i,j]-A[j]*H.subs(y,X[j]).subs(x,X[i]).evalf()
+			D[i,j]=D[i,j]-A[j]*H.subs(y,X[j]).subs(x,X[i])
 	
 	#print(D)
 	C=np.linalg.solve(D,g)
 	#print (C)
 	u=f
 	for i in range(0, n):
-		u=u+A[i]*H.subs(y,X[i]).evalf()*C[i]	
+		u=u+A[i]*H.subs(y,X[i])*C[i]	
 		i=i+1
 	return u
 
@@ -56,6 +51,7 @@ def fredgolm(H,f,n,a,b):
 	du=2*eps
 	u=f
 	k=n
+	j=1
 	while (du>eps):
 		temp=u.copy()
 		A=[]
@@ -70,8 +66,10 @@ def fredgolm(H,f,n,a,b):
 		#print ("nodes of kvadrature: ")
 		#print (X)
 		u= fred_iter(H,A,X,k,a,b,f)
-		k=2*k		
 		du=norm(u,temp,a,b)
+		print (("i=%d,n=%d,error=%e") % (j,k,du))		
+		k=2*k
+		j=j+1
 		
 	return u
 from sympy.plotting import plot
