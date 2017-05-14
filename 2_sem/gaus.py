@@ -20,17 +20,14 @@ def solve(mat):
 	i=0
 	num_rows, num_cols=A.shape
 	#strait run
-	while(i<num_rows):
-		j=i+1
+	for i in range(0, num_rows):
 		a_i_i=mat[i,i]
 		if (a_i_i<eps):
-			print 'warning: div by small number'
+			print ('warning: div by small number')
 		mat[i]=mat[i]/a_i_i
-		while(j<num_cols):
-			mat[j]=mat[j]-mat[j,i]*mat[i]				
-			j=j+1
-			
-		i=i+1
+		for j in range(i+1, num_rows):
+			mat[j]=mat[j]-mat[j,i]*mat[i]
+
 	#print(mat)
 	#reverce run
 	i=num_rows-1;
@@ -103,7 +100,7 @@ def solve_ch(mat):
 			j=j-1
 		i=i-1
 #	print(mat)
-	print index[0],index[1],index[2]
+	print (index[0],index[1],index[2])
 	return mat[:,num_cols]
 ############## find invariant matrix ####################
 def inv_matrix(A):
@@ -134,13 +131,13 @@ def fun(A,b):
 	print(x_ext)
 	print("solve: ")
 	x=solve(np.concatenate((A,b),axis=1))
-	print x;
+	print (x);
 	print("solve advance: ")
 	x_ad=solve_ch(np.concatenate((A,b),axis=1))
-	print x_ad;	
+	print( x_ad);	
 	print("inv matrix: ") 
 	A_inv=inv_matrix(A)
-	print A_inv
+	print (A_inv)
 	#print(A_inv)
 	norm = norm_inf(A)
 	print('norm: ')	

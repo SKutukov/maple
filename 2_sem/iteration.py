@@ -19,11 +19,11 @@ b= np.matrix(content[1])
 f.close()
 eps=float(args["eps"])
 ##########################################
-print A
-print b
-print "1)Solve gaus: "
+print (A)
+print (b)
+print ("1)Solve gaus: ")
 x_ext= np.linalg.solve(A,b)
-print x_ext
+print (x_ext)
 ###################################### transform to iteration form ###########################
 def transformation(A,b):
 	num_rows, num_cols=A.shape
@@ -44,25 +44,24 @@ def transformation(A,b):
 		g[i]=b[i]/A[i,i]
 		i=i+1
 	return H,np.matrix(g).T
-print "2)transformation to x=Hx+g : "
+print ("2)transformation to x=Hx+g : ")
 H,g=transformation(A,b)
-print "H: "
-print H
-print "g: "
-print g
-print "Norm of H: "
-print norm_inf(H)
-eps=0.000001
+print ("H: ")
+print (H)
+print ("g: ")
+print (g)
+print ("Norm of H: ")
+print (norm_inf(H))
 ################################ simple itaration #####################################3
-print "3) find k, ||x_*-x^k||<eps"
+print ("3) find k, ||x_*-x^k||<eps")
 def find_K(H,g,x_0,eps):
 	d=norm_inf(x_0)+norm_inf(g)/(1-norm_inf(H))
 	eps_d=eps/d
 	return math.ceil(np.log(eps/d)/np.log(norm_inf(H)))
 x_0=x_ext+np.matrix(' 0.2  0.2  0.2 ').T
 k_teor=find_K(H,g,x_0,eps)	
-print "k_teor: ", k_teor
-print "4) simple iteration"
+print ("k_teor: ", k_teor)
+print ("4) simple iteration")
 def iteration(H,g,x_0,eps):
 	dx=2*eps
 	x=x_0
@@ -81,25 +80,25 @@ def iteration(H,g,x_0,eps):
 		k=k+1
 	return x,k,dx,x1,r
 x_iter,k_ext,dx,x_k_1,r_exp= iteration(H,g,x_0,eps)
-print x_iter
-print "k_ext: ", k_ext
-print "ERROR x_ext-x_iter: "
-print x_ext-x_iter
-print "ERROR aprior: "
+print (x_iter)
+print ("k_ext: ", k_ext)
+print ("ERROR x_ext-x_iter: ")
+print (x_ext-x_iter)
+print ("ERROR aprior: ")
 def aprior(H,g,x_0,k):
 	norm=norm_inf(H)
 	d=norm_inf(x_0)+np.linalg.norm(g)/(1-norm)
 	return math.pow(norm,k)*(d)
-print aprior(H,g,x_0,k_teor)
-print "ERROR apostorior: "
-print dx
+print (aprior(H,g,x_0,k_teor))
+print ("ERROR apostorior: ")
+print (dx)
 r=spectr_radius(H)
 x_lust=x_k_1+(x_iter-x_k_1)/(1-r)
-print "lusternick :",x_lust
-print "ERROR lust: "
-print x_lust-x_ext
+print ("lusternick :",x_lust)
+print ("ERROR lust: ")
+print (x_lust-x_ext)
 ######################### zeidel ########################################
-print "5) Zeidel"
+print ("5) Zeidel")
 def transform_H(H):
 	num_rows, num_cols=H.shape
 	i=0
@@ -166,14 +165,14 @@ def zeidel(H,g,x_0,x_ext,eps,max_k):
 		k=k+1
 	return x,k
 x_zeid,k_zeid=zeidel(H,g,x_0,x_ext,eps,25)
-print "k_zeid: ", k_zeid
-print x_zeid
-print "ERRROR zeid: "
+print ("k_zeid: ", k_zeid)
+print (x_zeid)
+print ("ERRROR zeid: ")
 print (x_zeid-x_ext)
 ########################## relacs #######################################
-print "7) up relacs: "
+print ("7) up relacs: ")
 r=spectr_radius(H)
-print r
+print (r)
 
 def relacs(H,g,x_0,eps,max_k,q):
 	num_rows, num_cols=H.shape
@@ -194,9 +193,9 @@ def relacs(H,g,x_0,eps,max_k,q):
 	return x,k	
 	
 q=2/(1+math.sqrt(1-r*r))
-print "q: ",q
+print ("q: ",q)
 x_relacs,k_relacs=relacs(H,g,x_0,eps,25,q)
-print "k_relaks",k_relacs
-print "ERROR relacs:"
-print x_relacs-x_ext
+print ("k_relaks",k_relacs)
+print ("ERROR relacs:")
+print (x_relacs-x_ext)
 	
