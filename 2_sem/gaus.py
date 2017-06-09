@@ -72,7 +72,7 @@ def solve_ch(mat):
 	while(i<num_rows):
 	#	print(mat)		
 		j=i+1
-		a_i_i,max_row,max_col=find_max(mat,i,i)
+	#	a_i_i,max_row,max_col=find_max(mat,i,i)
 	#	print max_row,max_col
 		index[i],index[max_col]=index[max_col],index[i]
 		if(max_row!=i):

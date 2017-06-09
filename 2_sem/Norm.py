@@ -1,12 +1,11 @@
 import numpy as np
-import array
 def norm_inf(mat):
 	max=0
-	num_rows, num_cols =mat.shape
+	num_rows, num_cols = mat.shape
 	for i in range(0, num_rows):
-		sum=np.sum(np.absolute(mat[i]))
-		if (max<sum):
-			max=sum	
+		sum = np.sum(np.absolute(mat[i]))
+		if (max < sum):
+			max = sum	
 	return max
 def mul(A,B):
 	num_rowsA, num_colsA=A.shape
@@ -14,14 +13,13 @@ def mul(A,B):
 	if (num_colsA!=num_rowsB):
 		print ("study algebra!!!!!")
 		return
-	C=np.empty([num_rowsA,num_colsB])
+	C=np.empty([num_rowsA, num_colsB])
 	for i in range(0, num_rowsA):
 		for j in range(0, num_colsB):
-			for j in range(0, num_colsA):
-				C[i,j]=C[i,j]+A[i,k]*B[k,j]
-				k=k+1
-			j=j+1
-		i=i+1		
+			for k in range(0, num_colsA):
+				C[i,j] = C[i,j]+A[i,k]*B[k,j]
+				
+			
 	return C
 
 def max_fabs(h):

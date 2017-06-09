@@ -1,5 +1,4 @@
 import  numpy as np
-from Norm import mul 
 from Norm import max_fabs
 
 ##################### load data #######################

@@ -1,7 +1,5 @@
 import  numpy as np
 import math
-import array
-#from Norm import mul 
 
 ##################### load data #######################
 import argparse as ap
@@ -75,7 +73,6 @@ def Yakobi(A,eps):
 ############# X ########################
 		X_i=X[:,row].copy()
 		X_j=X[:,col].copy()
-		X_c=X.copy()
 		#A_k(*,i)=.......
 		#i=0
 		#X[row,:]=(c*X_i+s*X_j).T
@@ -89,7 +86,7 @@ def Yakobi(A,eps):
 		a_i_i=A_k[row,row].copy()
 		a_j_j=A_k[col,col].copy()
 		a_i_j=A_k[row,col].copy()
-		a_j_i=A_k[col,row].copy()
+#		a_j_i=A_k[col,row].copy()
 		
 		A_i=A_k[:,row].copy()
 		A_j=A_k[:,col].copy()

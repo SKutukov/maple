@@ -56,7 +56,7 @@ print (norm_inf(H))
 print ("3) find k, ||x_*-x^k||<eps")
 def find_K(H,g,x_0,eps):
 	d=norm_inf(x_0)+norm_inf(g)/(1-norm_inf(H))
-	eps_d=eps/d
+#	eps_d=eps/d
 	return math.ceil(np.log(eps/d)/np.log(norm_inf(H)))
 x_0=x_ext+np.matrix(' 0.2  0.2  0.2 ').T
 k_teor=find_K(H,g,x_0,eps)	
